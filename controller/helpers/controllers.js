@@ -1,8 +1,10 @@
+var constants = require("./constants");
+
 var preconditionErrorCheck = function (errors, responseObject) {
   return returnResponse(responseObject, 412, {}, errors[0].msg);
 };
 var returnResponse = function (responseObject, statusCode, data, message) {
-  if (!message) message = constant.statusCode[statusCode.toString()];
+  if (!message) message = constants.statusCode[statusCode.toString()];
   let statusObj = {
     data: data,
     message: message,
