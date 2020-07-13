@@ -1,5 +1,5 @@
 const express = require("express");
-const request = require("request");
+const req = require("request");
 require("dotenv").config();
 var {
   preconditionErrorCheck,
@@ -10,11 +10,13 @@ exports.currentWeather = async function (request, response) {
   request.checkParams("city", "City cannot be empty");
   let errors = request.validationErrors();
   if (errors) return preconditionErrorCheck(errors, response);
-
+  console.log(request.params);
   try {
-    request(
+    req(
       process.env.OPEN_WEATHER_URL +
-        `weather?q=${request.params.city}&appid=${process.env.OPEN_WEATHER_API_KEY}`,
+        `weather?q=${request.params.city}&appid=${
+          process.env.OPEN_WEATHER_API_KEY
+        }&units=${request.query.units || "metric"}`,
       (error, res, body) => {
         if (error) {
           return returnResponse(response, 500, {}, error.message);
