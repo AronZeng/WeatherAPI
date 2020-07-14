@@ -10,21 +10,22 @@ var {
 } = require("./helpers/controllers");
 
 exports.currentWeather = async function (request, response) {
+  console.log("GET /currentWeather");
   request.checkParams("city", "City cannot be empty!").trim().notEmpty();
   let errors = request.validationErrors();
   if (errors) return preconditionErrorCheck(errors, response);
   try {
     req(
       process.env.OPEN_WEATHER_URL +
-        `weather?q=${request.params.city}&appid=${
+        `weather?id=${request.params.city}&appid=${
           process.env.OPEN_WEATHER_API_KEY
         }&units=${request.query.units || "metric"}`,
       (error, res, body) => {
         if (error) {
+          console.log(error);
           return returnResponse(response, 500, {}, error.message);
         }
         var obj = JSON.parse(body);
-        console.log(obj);
         let data = {
           city_name: request.params.city,
           unit: request.query.units == "imperial" ? "Ferinheight" : "Celcius",
@@ -37,18 +38,21 @@ exports.currentWeather = async function (request, response) {
       }
     );
   } catch (error) {
+    console.log(error);
     return returnResponse(response, 500, {}, error.message);
   }
 };
 
 exports.currentAverage = async function (request, response) {
+  console.log("GET /currentAverage");
   request.checkParams("cities", "Cities cannot be empty").trim().notEmpty();
   let errors = request.validationErrors();
   if (errors) return preconditionErrorCheck(errors, response);
   try {
     let cities = JSON.parse(request.params.cities);
-    console.log(cities);
     let cityIds = "";
+
+    //when calling the API with multiple cities, it requires us to use IDs rather than the names
     for (var i = 0; i < cities.length; i++) {
       let city = cityList.find((city) => {
         return city.name == cities[i];
@@ -61,7 +65,6 @@ exports.currentAverage = async function (request, response) {
         }
       }
     }
-    console.log(cityIds);
     req(
       process.env.OPEN_WEATHER_URL +
         `group?id=${cityIds}&appid=${process.env.OPEN_WEATHER_API_KEY}&units=${
@@ -69,6 +72,7 @@ exports.currentAverage = async function (request, response) {
         }`,
       (error, res, body) => {
         if (error) {
+          console.log(error);
           return returnResponse(response, 500, {}, error.message);
         }
         var obj = JSON.parse(body);
@@ -89,10 +93,12 @@ exports.currentAverage = async function (request, response) {
       }
     );
   } catch (error) {
+    console.log(error);
     return returnResponse(response, 500, {}, error.message);
   }
 };
 
 exports.notFound = function (request, response) {
-  return returnResponse(response, 404, {}, {});
+  console.log("404 NOT FOUND");
+  return returnResponse(response, 404, {}, "404 NOT FOUND");
 };
