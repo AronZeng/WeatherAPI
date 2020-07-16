@@ -17,7 +17,7 @@ exports.currentWeather = async function (request, response) {
   try {
     req(
       process.env.OPEN_WEATHER_URL +
-        `weather?id=${request.params.city}&appid=${
+        `weather?q=${request.params.city}&appid=${
           process.env.OPEN_WEATHER_API_KEY
         }&units=${request.query.units || "metric"}`,
       (error, res, body) => {
